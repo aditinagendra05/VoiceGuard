@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unlock Document - VoiceGuard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 60px 40px;
+            text-align: center;
+        }
+        
+        .lock-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: lockPulse 2s infinite;
+        }
+        
+        @keyframes lockPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+        
+        .document-info {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 30px 0;
+            text-align: left;
+        }
+        
+        .document-info h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .info-value {
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .recording-area {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 40px;
+            margin-bottom: 30px;
+        }
+        
+        .microphone-icon {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            color: white;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .microphone-icon:hover {
+            transform: scale(1.05);
+        }
+        
+        .microphone-icon.recording {
+            animation: pulse 1.5s infinite;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+        
+        .status {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .timer {
+            font-size: 3em;
+            font-weight: 700;
+            color: #667eea;
+            margin: 20px 0;
+            font-variant-numeric: tabular-nums;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .instructions {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            text-align: left;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .instructions strong {
+            color: #856404;
+        }
+        
+        .btn {
+            padding: 14px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin: 5px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+        }
+        
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .message.error {
+            background: #fee;
+            color: #c33;
+            border: 1px solid #fcc;
+        }
+        
+        .message.success {
+            background: #efe;
+            color: #3c3;
+            border: 1px solid #cfc;
+        }
+        
+        .security-info {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            text-align: left;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #1565c0;
+        }
+        
+        .verification-results {
+            display: none;
+            margin-top: 20px;
+        }
+        
+        .score-box {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .score-label {
+            font-weight: 600;
+            color: #666;
+        }
+        
+        .score-value {
+            font-size: 1.5em;
+            font-weight: 700;
+        }
+        
+        .score-pass {
+            color: #28a745;
+        }
+        
+        .score-fail {
+            color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="lock-icon">🔒</div>
+        <h1>Voice Authentication Required</h1>
+        
+        <div class="document-info">
+            <h3>📄 Document Details</h3>
+            <div class="info-row">
+                <span class="info-label">Filename:</span>
+                <span class="info-value">{{ document.filename }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Status:</span>
+                <span class="info-value" style="color: #dc3545;">🔒 Locked</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Uploaded:</span>
+                <span class="info-value">{{ document.uploaded_at.strftime('%Y-%m-%d %H:%M') }}</span>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <strong>⚠️ Security Check:</strong> Please speak naturally for 3-5 seconds. The system will verify:
+            <br>• That you are speaking live (not a recording)
+            <br>• That your voice matches the registered template
+        </div>
+        
+        <div class="recording-area">
+            <div id="microphone" class="microphone-icon" onclick="toggleRecording()">🎤</div>
+            <div id="status" class="status">Click the microphone to authenticate</div>
+            <div id="timer" class="timer" style="display: none;">0.0s</div>
+            <div class="progress-bar" style="display: none;" id="progress-container">
+                <div id="progress" class="progress-fill"></div>
+            </div>
+        </div>
+        
+        <div id="verification-results" class="verification-results">
+            <h3>Verification Results:</h3>
+            <div class="score-box">
+                <span class="score-label">🎭 Spoof Detection:</span>
+                <span id="spoof-score" class="score-value">--</span>
+            </div>
+            <div class="score-box">
+                <span class="score-label">🎯 Voice Match:</span>
+                <span id="match-score" class="score-value">--</span>
+            </div>
+        </div>
+        
+        <button id="verify-btn" class="btn" onclick="verifyVoice()" style="display: none;">Verify & Unlock</button>
+        <button id="retry-btn" class="btn btn-secondary" onclick="retryRecording()" style="display: none;">Record Again</button>
+        <button class="btn btn-secondary" onclick="goBack()">Back to Dashboard</button>
+        
+        <div id="message" class="message"></div>
+        
+        <div class="security-info">
+            🛡️ <strong>Security Features:</strong> This system uses advanced voice biometrics to ensure only you can access your documents. Both liveness detection and voice matching must pass.
+        </div>
+    </div>
+    
+    <script>
+    let mediaRecorder;
+        let audioChunks = [];
+        let isRecording = false;
+        let startTime;
+        let timerInterval;
+        let audioBlob;
+    const docId = '{{ document.id }}';
+        
+        async function toggleRecording() {
+            if (isRecording) {
+                stopRecording();
+            } else {
+                await startRecording();
+            }
+        }
+        
+        async function startRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+                
+                mediaRecorder.ondataavailable = (event) => {
+                    audioChunks.push(event.data);
+                };
+                
+                mediaRecorder.onstop = () => {
+                    audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    document.getElementById('verify-btn').style.display = 'inline-block';
+                    document.getElementById('retry-btn').style.display = 'inline-block';
+                    showMessage('Recording complete! Click "Verify & Unlock" to authenticate.', 'success');
+                };
+                
+                mediaRecorder.start();
+                isRecording = true;
+                
+                document.getElementById('microphone').classList.add('recording');
+                document.getElementById('status').textContent = 'Recording... Click to stop';
+                document.getElementById('timer').style.display = 'block';
+                document.getElementById('progress-container').style.display = 'block';
+                
+                startTime = Date.now();
+                timerInterval = setInterval(updateTimer, 100);
+                
+            } catch (error) {
+                showMessage('Microphone access denied. Please allow microphone access.', 'error');
+            }
+        }
+        
+        function stopRecording() {
+            if (mediaRecorder && isRecording) {
+                mediaRecorder.stop();
+                mediaRecorder.stream.getTracks().forEach(track => track.stop());
+                isRecording = false;
+                
+                clearInterval(timerInterval);
+                
+                document.getElementById('microphone').classList.remove('recording');
+                document.getElementById('status').textContent = 'Recording stopped';
+                document.getElementById('progress').style.width = '100%';
+            }
+        }
+        
+        function updateTimer() {
+            const elapsed = (Date.now() - startTime) / 1000;
+            document.getElementById('timer').textContent = elapsed.toFixed(1) + 's';
+            
+            const progress = Math.min((elapsed / 5) * 100, 100);
+            document.getElementById('progress').style.width = progress + '%';
+            
+            if (elapsed >= 10) {
+                stopRecording();
+                showMessage('Maximum recording length reached (10 seconds)', 'error');
+            }
+        }
+        
+        function retryRecording() {
+            audioBlob = null;
+            audioChunks = [];
+            document.getElementById('verify-btn').style.display = 'none';
+            document.getElementById('retry-btn').style.display = 'none';
+            document.getElementById('status').textContent = 'Click the microphone to authenticate';
+            document.getElementById('timer').style.display = 'none';
+            document.getElementById('timer').textContent = '0.0s';
+            document.getElementById('progress-container').style.display = 'none';
+            document.getElementById('progress').style.width = '0%';
+            document.getElementById('verification-results').style.display = 'none';
+            hideMessage();
+        }
+        
+        async function verifyVoice() {
+            if (!audioBlob) {
+                showMessage('No recording found. Please record first.', 'error');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('audio', audioBlob, 'live.wav');
+            
+            document.getElementById('verify-btn').disabled = true;
+            document.getElementById('verify-btn').textContent = 'Verifying...';
+            
+            try {
+                const response = await fetch('/verify-voice/' + docId, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                // Show verification results
+                document.getElementById('verification-results').style.display = 'block';
+                
+                if (data.spoof_score !== undefined) {
+                    const spoofEl = document.getElementById('spoof-score');
+                    spoofEl.textContent = (data.spoof_score * 100).toFixed(1) + '%';
+                    spoofEl.className = 'score-value ' + (data.spoof_score > 0.5 ? 'score-pass' : 'score-fail');
+                }
+                
+                if (data.match_score !== undefined) {
+                    const matchEl = document.getElementById('match-score');
+                    matchEl.textContent = (data.match_score * 100).toFixed(1) + '%';
+                    matchEl.className = 'score-value ' + (data.match_score > 0.7 ? 'score-pass' : 'score-fail');
+                }
+                
+                if (data.success) {
+                    showMessage('✅ Authentication successful! Unlocking document...', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/dashboard';
+                    }, 2000);
+                } else {
+                    showMessage('❌ Authentication failed: ' + data.message, 'error');
+                    document.getElementById('verify-btn').disabled = false;
+                    document.getElementById('verify-btn').textContent = 'Verify & Unlock';
+                }
+            } catch (error) {
+                showMessage('Connection error. Please try again.', 'error');
+                document.getElementById('verify-btn').disabled = false;
+                document.getElementById('verify-btn').textContent = 'Verify & Unlock';
+            }
+        }
+        
+        function showMessage(text, type) {
+            const msg = document.getElementById('message');
+            msg.textContent = text;
+            msg.className = 'message ' + type;
+            msg.style.display = 'block';
+        }
+        
+        function hideMessage() {
+            document.getElementById('message').style.display = 'none';
+        }
+        
+        function goBack() {
+            window.location.href = '/dashboard';
+        }
+    </script>
+</body>
+</html>

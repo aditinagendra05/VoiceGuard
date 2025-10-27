@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Record Voice Template</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 60px 40px;
+            text-align: center;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+        }
+        
+        .recording-area {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 40px;
+            margin-bottom: 30px;
+        }
+        
+        .microphone-icon {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            color: white;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .microphone-icon:hover {
+            transform: scale(1.05);
+        }
+        
+        .microphone-icon.recording {
+            animation: pulse 1.5s infinite;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+        
+        .status {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .instructions {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 20px;
+            text-align: left;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        
+        .instructions h3 {
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+        
+        .instructions ul {
+            margin-left: 20px;
+            color: #555;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+        }
+        
+        .timer {
+            font-size: 3em;
+            font-weight: 700;
+            color: #667eea;
+            margin: 20px 0;
+            font-variant-numeric: tabular-nums;
+        }
+        
+        .btn {
+            padding: 14px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin: 5px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+        }
+        
+        .message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .message.error {
+            background: #fee;
+            color: #c33;
+            border: 1px solid #fcc;
+        }
+        
+        .message.success {
+            background: #efe;
+            color: #3c3;
+            border: 1px solid #cfc;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎙️ Record Your Voice</h1>
+        <p class="subtitle">This is a one-time setup to create your voice template</p>
+        
+        <div class="instructions">
+            <h3>📋 Instructions:</h3>
+            <ul>
+                <li>Find a quiet environment</li>
+                <li>Click the microphone to start recording</li>
+                <li>Speak naturally for 3-5 seconds</li>
+                <li>Say a phrase like: "My voice is my password"</li>
+                <li>This template will be used to authenticate you in the future</li>
+            </ul>
+        </div>
+        
+        <div class="recording-area">
+            <div id="microphone" class="microphone-icon" onclick="toggleRecording()">🎤</div>
+            <div id="status" class="status">Click the microphone to start</div>
+            <div id="timer" class="timer" style="display: none;">0.0s</div>
+            <div class="progress-bar" style="display: none;" id="progress-container">
+                <div id="progress" class="progress-fill"></div>
+            </div>
+        </div>
+        
+        <button id="save-btn" class="btn" onclick="saveTemplate()" style="display: none;">Save Template</button>
+        <button id="retry-btn" class="btn btn-secondary" onclick="retryRecording()" style="display: none;">Record Again</button>
+        <button class="btn btn-secondary" onclick="logout()">Logout</button>
+        
+        <div id="message" class="message"></div>
+    </div>
+    
+    <script>
+        let mediaRecorder;
+        let audioChunks = [];
+        let isRecording = false;
+        let startTime;
+        let timerInterval;
+        let audioBlob;
+        
+        async function toggleRecording() {
+            if (isRecording) {
+                stopRecording();
+            } else {
+                await startRecording();
+            }
+        }
+        
+        async function startRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+                
+                mediaRecorder.ondataavailable = (event) => {
+                    audioChunks.push(event.data);
+                };
+                
+                mediaRecorder.onstop = () => {
+                    audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    document.getElementById('save-btn').style.display = 'inline-block';
+                    document.getElementById('retry-btn').style.display = 'inline-block';
+                    showMessage('Recording complete! You can save it or record again.', 'success');
+                };
+                
+                mediaRecorder.start();
+                isRecording = true;
+                
+                document.getElementById('microphone').classList.add('recording');
+                document.getElementById('status').textContent = 'Recording... Click to stop';
+                document.getElementById('timer').style.display = 'block';
+                document.getElementById('progress-container').style.display = 'block';
+                
+                startTime = Date.now();
+                timerInterval = setInterval(updateTimer, 100);
+                
+            } catch (error) {
+                showMessage('Microphone access denied. Please allow microphone access.', 'error');
+            }
+        }
+        
+        function stopRecording() {
+            if (mediaRecorder && isRecording) {
+                mediaRecorder.stop();
+                mediaRecorder.stream.getTracks().forEach(track => track.stop());
+                isRecording = false;
+                
+                clearInterval(timerInterval);
+                
+                document.getElementById('microphone').classList.remove('recording');
+                document.getElementById('status').textContent = 'Recording stopped';
+                document.getElementById('progress').style.width = '100%';
+            }
+        }
+        
+        function updateTimer() {
+            const elapsed = (Date.now() - startTime) / 1000;
+            document.getElementById('timer').textContent = elapsed.toFixed(1) + 's';
+            
+            const progress = Math.min((elapsed / 5) * 100, 100);
+            document.getElementById('progress').style.width = progress + '%';
+            
+            if (elapsed >= 10) {
+                stopRecording();
+                showMessage('Maximum recording length reached (10 seconds)', 'error');
+            }
+        }
+        
+        function retryRecording() {
+            audioBlob = null;
+            audioChunks = [];
+            document.getElementById('save-btn').style.display = 'none';
+            document.getElementById('retry-btn').style.display = 'none';
+            document.getElementById('status').textContent = 'Click the microphone to start';
+            document.getElementById('timer').style.display = 'none';
+            document.getElementById('timer').textContent = '0.0s';
+            document.getElementById('progress-container').style.display = 'none';
+            document.getElementById('progress').style.width = '0%';
+            hideMessage();
+        }
+        
+        async function saveTemplate() {
+            if (!audioBlob) {
+                showMessage('No recording found. Please record first.', 'error');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('audio', audioBlob, 'template.wav');
+            
+            document.getElementById('save-btn').disabled = true;
+            document.getElementById('save-btn').textContent = 'Saving...';
+            
+            try {
+                const response = await fetch('/save-template', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showMessage('Voice template saved successfully! Redirecting...', 'success');
+                    setTimeout(() => window.location.href = '/dashboard', 2000);
+                } else {
+                    showMessage(data.error || 'Failed to save template', 'error');
+                    document.getElementById('save-btn').disabled = false;
+                    document.getElementById('save-btn').textContent = 'Save Template';
+                }
+            } catch (error) {
+                showMessage('Connection error. Please try again.', 'error');
+                document.getElementById('save-btn').disabled = false;
+                document.getElementById('save-btn').textContent = 'Save Template';
+            }
+        }
+        
+        function showMessage(text, type) {
+            const msg = document.getElementById('message');
+            msg.textContent = text;
+            msg.className = 'message ' + type;
+            msg.style.display = 'block';
+        }
+        
+        function hideMessage() {
+            document.getElementById('message').style.display = 'none';
+        }
+        
+        function logout() {
+            window.location.href = '/logout';
+        }
+    </script>
+</body>
+</html>
