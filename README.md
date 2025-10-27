@@ -241,6 +241,8 @@ MIT License - see LICENSE file for details
 ## 👨‍💻 Author
 
 Your Name - Aditi Nagendra
+https://github.com/aditinagendra05
+
 # 🎙️ VoiceGuard - Voice-Authenticated Document Security System
 
 A secure document management system that uses **voice biometrics** and **anti-spoofing detection** to protect sensitive files. Only the authenticated user's live voice can unlock their documents.
@@ -811,4 +813,5 @@ attacks. Built with Python, Flask, and audio ML.
 Enterprise-grade voice authentication platform for document security. 
 Features real-time biometric verification, replay attack prevention, 
 and MFCC-based speaker recognition with 70%+ accuracy threshold.
+
 
